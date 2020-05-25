@@ -13,6 +13,7 @@ class ChatPage extends Component {
             <span>How are you?</span>
           </div>
         </div>
+
         <div className="m-3">
           <div className="text-center mb-2">Users online: 1</div>
           <div className="col-12">
