@@ -57,10 +57,17 @@ class App extends React.Component {
   };
 
   receive_msg = (state, message) => {
-    state.messages.push({
-      user_color: message.body[0],
-      body: state.rsa.decrypt(message.body[1]),
-      date: new Date()
+    // state.messages.push({
+    //   user_color: message.body[0],
+    //   body: state.rsa.decrypt(message.body[1]),
+    //   date: new Date()
+    // })
+    this.setState({
+      messages: this.state.messages.concat({
+        user_color: message.body[0],
+        body: state.rsa.decrypt(message.body[1]),
+        date: new Date()
+      })
     })
   }
 
@@ -160,7 +167,7 @@ class App extends React.Component {
     const encMessage = state.users.map((user) => {
       let encrypt = new JSEncrypt()
       encrypt.setPublicKey(user.rsa_pub)
-
+      console.log(encrypt.encrypt(message),"enc msg")
       return [
         user.user_color,
         encrypt.encrypt(message)
