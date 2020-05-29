@@ -1,13 +1,13 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import { connect } from "react-redux";
-import FrontChatRoomForm from "./components/FrontChatRoomForm";
+// import { connect } from "react-redux";
+// import FrontChatRoomForm from "./components/FrontChatRoomForm";
 import { JSEncrypt } from "jsencrypt";
 import EnterPasswordToConnectPage from "./components/EnterPasswordToConnectPage";
-import ChatPage from "./components/ChatPage";
+// import ChatPage from "./components/ChatPage";
 import "./App.css";
 import * as helpers from "./helpers";
-import { Link, withRouter } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { AES, enc as CryptoEnc } from "crypto-js";
 import { Presence } from './phoenix';
 
@@ -57,11 +57,6 @@ class App extends React.Component {
   };
 
   receive_msg = (state, message) => {
-    // state.messages.push({
-    //   user_color: message.body[0],
-    //   body: state.rsa.decrypt(message.body[1]),
-    //   date: new Date()
-    // })
     this.setState({
       messages: this.state.messages.concat({
         user_color: message.body[0],
@@ -92,15 +87,15 @@ class App extends React.Component {
     })
   }
 
-  // presence_meta = (presence) => {
-  //   presence[''].metas;
-  // }
+  presence_meta = (presence) => {
+    presence = presence[''].metas;
+  }
 
   update_presence = (state,presence) => {
     state.presence = presence
     if ((presence[''] || {}).metas) {
       this.update_users(this.state, this.state.users);
-      // this.presence_meta(presence)
+      this.presence_meta(presence);
     }
   }
 
@@ -162,8 +157,15 @@ class App extends React.Component {
     });
   };
 
+  empty_state_message = () => {
+    this.setState({
+      message: ""
+    })
+  }
+
   send_message = (e,message,state) => {
     e.preventDefault()
+    let encrypt = new JSEncrypt()
     const encMessage = state.users.map((user) => {
       let encrypt = new JSEncrypt()
       encrypt.setPublicKey(user.rsa_pub)
@@ -173,8 +175,16 @@ class App extends React.Component {
         encrypt.encrypt(message)
       ]
     })
-
+    console.log("enc msg", encMessage)
+    var messages = this.state.messages;
+    messages.push({
+      user_color: "0000FF",
+      body: encrypt.encrypt(message),
+      date: new Date()
+    })
+    // .then(() => )
     state.channel.push('new_msg', {body: encMessage})
+    this.empty_state_message()
   }
 
   onSubmit = () => {
@@ -190,7 +200,6 @@ class App extends React.Component {
         allowEntranceSubmit: true,
       });
     });
-
     socket.onOpen(() => {
       const rsa = new JSEncrypt({ default_key_size: 2048 });
       console.log(rsa)
@@ -232,7 +241,7 @@ class App extends React.Component {
   };
 
   render() {
-    console.log("messages", this.state)
+    // console.log("messages", this.state)
     return (
       <div className="container p-5">
         <Switch>
@@ -240,7 +249,6 @@ class App extends React.Component {
             {/* <FrontChatRoomForm /> */}
             <div className="container">
               <div className="jumbotron">
-              
                   <div className="form-group">
                     <label for="exampleInputEmail1">Your desired room id</label>
                     <input
@@ -272,12 +280,12 @@ class App extends React.Component {
                   <button
                     type="submit"
                     onClick={this.onSubmit}
+                    
                     className="btn btn-lg btn-secondary btn-block"
                   >
                     Submit
                   </button>
                   </Link>
-             
               </div>
             </div>
           </Route>
@@ -286,41 +294,35 @@ class App extends React.Component {
           </Route>
           <Route exact path="/chat">
             {/* <ChatPage state={this.state} receiveMessage={this.receive_msg} /> */}
-            <div className="container">
-        <div className="chat_div">
-          <div className="text-center m-2">CHATS</div>
-        {this.state.messages.map((message) => {
-          return <div style={{border:`3px solid #${message.user_color}`}}>
-          <div  class="alert alert-secondary m-3" role="alert">
-          <span>{message.body}</span>
-        </div>
-        </div>
-        })}
-
-        {/* {this.state.channel.map((message) => {
-          return <div>
-          <div  class="alert alert-secondary m-3" role="alert">
-          <span>message</span>
-        </div>
-          </div>
-        })} */}
-      
-        </div>
-        <div className="m-3">
-          <div className="text-center mb-2">Users online: 1</div>
-          <div className="col-12">
-            <form onSubmit={(e) => this.send_message(e,this.state.message,this.state)}>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control form-control-lg"
-                  placeholder="enter your message"
-                />
+            <div className="container" onLoad={this.onSubmit}>
+              <div className="chat_div">
+                <div className="text-center m-2">CHATS</div>
+                {this.state.messages.map((message) => {
+                return <div style={{border:`3px solid #${message.user_color}`}}>
+                <div  class="alert alert-secondary m-3" role="alert">
+                <span>{message.body}</span>
               </div>
-            </form>
-          </div>
-        </div>
-      </div>
+              </div>
+              })}
+              </div>
+              <div className="m-3">
+                <div className="text-center mb-2">Users online: 1</div>
+                <div className="col-12">
+                  <form onSubmit={(e) => this.send_message(e,this.state.message,this.state)}>
+                    <div className="form-group">
+                      <input
+                        type="text"
+                        className="form-control form-control-lg"
+                        placeholder="enter your message"
+                        name="message"
+                        value={this.state.message}
+                        onChange={this.onChange}
+                      />
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
           </Route>
         </Switch>
       </div>
