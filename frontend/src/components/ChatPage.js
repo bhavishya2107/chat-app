@@ -1,7 +1,34 @@
 import React, { Component } from "react";
 
 class ChatPage extends Component {
+  constructor(){
+    super()
+    this.state = {
+
+    }
+  }
+
+
+
+  // SEND_MESSAGE ({state, commit}, message) {
+  //   const encMessage = state.users.map((user) => {
+  //     let encrypt = new JSEncrypt()
+  //     encrypt.setPublicKey(user.rsa_pub)
+
+  //     return [
+  //       user.user_color,
+  //       encrypt.encrypt(message)
+  //     ]
+  //   })
+
+  //   state.channel.push('new_msg', {body: encMessage})
+  // }
+
+
+
+
   render() {
+    console.log(this.props,"props in chat page")
     return (
       <div className="container">
         <div className="chat_div">
