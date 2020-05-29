@@ -9,7 +9,7 @@ import "./App.css";
 import * as helpers from "./helpers";
 import { Link } from 'react-router-dom'
 import { AES, enc as CryptoEnc } from "crypto-js";
-import { Presence } from './phoenix';
+import { Presence } from './phoenix'
 
 
 
